@@ -7,6 +7,7 @@ Lightweight distributed wasm orchestrator (to be) written in go
 - Lightweight (in regards to memory, cpu and LoC)
 - High availability
 - Autoscale services
+- Minimal third party dependencies
 - CLI (monitor and manage cluster)
 
 ## Components: master
