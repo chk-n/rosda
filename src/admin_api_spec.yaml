@@ -1,0 +1,380 @@
+openapi: 3.1.0
+info:
+  title: Dash Admin API
+  description: Contains methods to manage cluster such as informing new deployment exists, getting cluster metrics.
+  version: 1.0.0
+paths:
+  /v1/auth/clients:
+    post:
+      summary: Creates a new client token for internal API access.
+      responses:
+        '200':
+          description: Client token created successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/AuthClientsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/services:
+    get:
+      summary: List all services with optional search filters.
+      parameters:
+        - name: acl
+          in: query
+          description: Where to include acls in the result. Default is false
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - $ref: '#/components/parameters/TagParam'
+        - $ref: '#/components/parameters/DatacenterParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/PageParam'
+      responses:
+        '200':
+          description: List of services.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServicesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Creates a new service with the provided configuration.
+      responses:
+        '201':
+          description: Service created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/ServicesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Updates an existing service with the provided configuration.
+      responses:
+        '200':
+          description: Service updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/ServicesResponse'
+        '400':
+         $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/services/{service_id}:
+    get:
+      summary: Get the current status of the service. Same as GET /services except for a specific service
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+          description: Unique ID of the service.
+      responses:
+        '200':
+          description: Service
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/ServicesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/services/deployments/{service_id}:
+    get:
+      summary: Gets current deployment status of a service
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+          description: Unique ID of the service.
+        - in: query
+          name: deployment_id
+          required: false
+          schema:
+            type: string
+          description: Unique ID of the deployment. Setting this will return the specific deployment status. Otherwise all current deployments of a service are returned.
+      responses:
+        '200':
+          description: Deployment statuses fetched successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServicesDeyploymentsResponse'
+    post:
+      summary: Create a new deployment for a service.
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+          description: Unique ID of the service.
+      responses:
+        '201':
+          description: Deployment created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/ServicesDeyploymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/nodes:
+    get:
+      summary: List all nodes with optional search filters.
+      parameters:
+        - $ref: '#/components/parameters/TagParam'
+        - $ref: '#/components/parameters/DatacenterParam'
+      responses:
+        '200':
+          description: List of nodes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NodesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/cluster/health:
+    get:
+      summary: Returns the health of the cluster.
+      parameters:
+        - $ref: '#/components/parameters/DatacenterParam'
+      responses:
+        '200':
+          description: Cluster health information.
+          # TODO:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403': 
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      
+
+  /v1/cluster/metrics:
+    get:
+      summary: Returns metrics like used CPU, RAM, number of masters and slaves, latency.
+      parameters:
+        - $ref: '#/components/parameters/DatacenterParam'
+      responses:
+        '200':
+          description: Cluster metrics information.
+          #TODO:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas: 
+    AuthClientsResponse:
+      type: object
+      required:
+        - token
+        - expiration
+      properties:
+        token:
+          type: string
+        expiration:
+          type: string
+          format: date-time
+    ServicesResponse:
+      type: object
+      required:
+        - service_id
+        - instance_count
+        - min_instance_count
+        - max_instance_count
+        - allocated_cpu
+        - allocated_am
+        - deployment_strategy
+      properties:
+        service_id:
+          type: string
+        instance_count:
+          type: integer
+          format: int32
+        min_instance_count:
+          type: integer
+          format: int32
+        max_instance_count:
+          type: integer
+          format: int32
+        allocated_cpu:
+          type: integer
+          format: int32
+        allocated_am:
+          type: integer
+          format: int32
+        deployment_strategy:
+          type: string
+          enum:
+            - rolling
+            - canary
+            - bluegreen
+    ServicesDeyploymentsResponse:
+      type: object
+      required:
+        - service_id
+        - deployment_id
+      properties:
+        deployment_id:
+          type: string
+        service_id:
+          type: string
+    NodesResponse:
+      type: object
+      required:
+        - resource_id
+        - capacity_cpu
+        - capacity_ram
+        - reserved_cpu
+        - reserved_ram
+      properties: 
+        resource_id:
+          type: string
+        capacity_cpu:
+          type: integer
+          format: int32
+        capacity_ram:
+          type: integer
+          format: int32
+        reserved_cpu:
+          type: integer
+          format: int32
+        reserved_ram:
+          type: integer
+          format: int32
+    ErrorResponse:
+      type: object
+      required:
+        - reason
+        - error_code
+      properties:
+        reason:
+          type: string
+        error_code:
+          type: integer
+          format: int32
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Filter by page
+      required: false
+      schema:
+        type: integer
+    LimitParam:
+      name: limit
+      in: query
+      description: Maximum number of items to return
+      required: false
+      schema:
+        type: integer
+        default: 50
+    TagParam:
+      name: tag
+      in: query
+      description: filter by tag
+      required: false
+      schema:
+        type: string
+    DatacenterParam:
+      name: dc
+      in: query
+      description: filter by datacenter
+      required: false
+      schema:
+        type: string
+
+  responses:
+    Unauthorized:
+      description: User not authorized. ErrorResponse will have error_code -1
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: User does not have access to requested resource. ErrorResponse will have error_code -1
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Internal server error. Note; ErrorResponse will have error_code -1
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/ErrorResponse'
+
+  
+
+
