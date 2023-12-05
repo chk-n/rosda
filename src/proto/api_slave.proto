@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+option go_package = "internal/proto";
+
+
+service ApiSlave {
+    rpc RecordService(RecordServiceRequest) returns (RecordServiceResponse) {}
+    rpc RemoveService(RemoveServiceRequest) returns  (RemoveServiceResponse) {}
+}
+
+// RecordServiceRequest definition in protobuf
+message RecordServiceRequest {
+    string ResourceId = 1; // Resource ID
+
+    // where image can be fetched from
+    string ImageUrl = 2;
+
+    uint32 Cpu = 3;
+    uint32 Ram = 4;
+
+    // absolute number of instances that should be running
+    uint32 InstanceCount = 5;
+
+    string EnvVariables = 6;
+
+    // Additional comments regarding temporary scale on node and scale threshold
+    // can be included here as comments, as protobuf does not support direct annotations like Cap'n Proto
+}
+
+// RecordServiceResponse definition in protobuf
+message RecordServiceResponse {
+    // which port on host is open for connections to service
+    uint32 Port = 1;
+}
+
+// RemoveServiceRequest definition in protobuf
+message RemoveServiceRequest {
+    string ResourceId = 1;
+
+    // how many seconds slave should wait before removing service
+    string TeardownDelay = 2;
+}
+
+// RemoveServiceResponse definition in protobuf
+message RemoveServiceResponse {
+    string ResourceId = 1;
+}
+
