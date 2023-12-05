@@ -22,6 +22,7 @@ Lightweight distributed wasm orchestrator (to be) written in go
 - `sysnet`: local network configurations (e.g. firewalls)
 - `godaft`: simple leader election protocol for masters
 - `config_parser`: reads and validates service configuration files
+
 and other miscelaneous utilities
 
 ## Components: worker
@@ -39,6 +40,7 @@ and other miscelaneous utilities
 - `protobuf`
 - `traefik`
 - `wasmer-go`
+
 for dev/tests
 - `assert`
 - `oapi-codegen`
