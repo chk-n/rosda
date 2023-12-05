@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option go_package = "internal/proto";
+
+service ApiMaster {
+    rpc GetImage(GetImageRequest) returns (Empty) {}
+    // registers new node, this will trigger creation of client TLS cert
+    rpc RegisterSlave(RegisterSlaveRequest) returns (RegisterSlaveResponse) {}
+    rpc RegisterMaster(RegisterMasterRequest) returns (RegisterMasterResponse) {}
+}
+
+// RecordLoadRequest definition in protobuf
+message RecordLoadRequest {
+    uint32 cpu = 1;
+    uint32 ram = 2;
+}
+
+// GetImageRequest definition in protobuf
+message GetImageRequest {
+    string resourceId = 1;
+    bytes data = 2; // Assuming 'data' is a byte array
+}
+
+// RegisterSlaveRequest definition in protobuf
+message RegisterSlaveRequest {
+    string SignedMessage = 1;
+}
+
+// RegisterSlaveResponse definition in protobuf
+message RegisterSlaveResponse {
+    string resourceId = 1;
+
+    // Pem encoded
+    string clientKey = 2;
+
+    // Pem encoded
+    string clientCert = 3;
+
+    // List of master nodes
+    // Note: Protobuf does not support 'TODO' types, you need to define the type for masterNodes
+    // Assuming it's a repeated string for the example
+    repeated string masterNodes = 4;
+}
+
+message RegisterMasterRequest {
+    // TODO
+}
+
+message RegisterMasterResponse {
+    // TODO
+}
+
+message Empty {}
