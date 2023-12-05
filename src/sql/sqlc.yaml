@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "sqlite/query_master.sql"
+    schema: "sqlite/schema_master.sql"
+    gen:
+      go:
+        package: "query_master"
+        out: "query_master"
