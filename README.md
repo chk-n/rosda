@@ -5,10 +5,10 @@ Lightweight distributed wasm orchestrator (to be) written in go
 
 - Simple to use and manage
 - Lightweight (in regards to memory, cpu and LoC)
-- High availability
-- Autoscale services
+- Highly availabile
+- Autoscales services
 - Minimal third party dependencies
-- CLI (monitor and manage cluster)
+- CLI for monitoring and management of cluster
 
 ## Components: master
 - `admin_api`: http endpoint for CLIs and web pages to interact with
@@ -22,6 +22,7 @@ Lightweight distributed wasm orchestrator (to be) written in go
 - `sysnet`: local network configurations (e.g. firewalls)
 - `godaft`: simple leader election protocol for masters
 - `config_parser`: reads and validates service configuration files
+
 and other miscelaneous utilities
 
 ## Components: worker
@@ -31,6 +32,19 @@ and other miscelaneous utilities
 - `proxy`: traefik proxy for request to service mapping
 - `sysnet`: local network configurations (e.g. firewalls)
 - `wasm_runtime`: runs wasm services
+
+## Third party dependencies
+- [chi](https://github.com/go-chi/chi)
+- [drpc](https://github.com/storj/drpc)
+- [go-sqlite3](https://github.com/mattn/go-sqlite3)
+- [protobuf](https://github.com/golang/protobuf)
+- [traefik](https://github.com/traefik/traefik)
+- [wasmer-go](https://github.com/wasmerio/wasmer-go)
+
+for dev/tests
+- [testify](https://github.com/stretchr/testify)
+- [oapi-codegen](https://github.com/deepmap/oapi-codegen)
+- [sqlc](https://github.com/sqlc-dev/sqlc)
 
 ## V2 Goals/Ideas
 - Web portal
