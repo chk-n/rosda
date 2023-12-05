@@ -34,17 +34,17 @@ and other miscelaneous utilities
 - `wasm_runtime`: runs wasm services
 
 ## Third party dependencies
-- `chi`
-- `drpc`
-- `go-sqlite3`
-- `protobuf`
-- `traefik`
-- `wasmer-go`
+- [chi](https://github.com/go-chi/chi)
+- [drpc](https://github.com/storj/drpc)
+- [go-sqlite3](https://github.com/mattn/go-sqlite3)
+- [protobuf](https://github.com/golang/protobuf)
+- [traefik](https://github.com/traefik/traefik)
+- [wasmer-go](https://github.com/wasmerio/wasmer-go)
 
 for dev/tests
-- `assert`
-- `oapi-codegen`
-- `sqlc`
+- [testify](https://github.com/stretchr/testify)
+- [oapi-codegen](https://github.com/deepmap/oapi-codegen)
+- [sqlc](https://github.com/sqlc-dev/sqlc)
 
 ## V2 Goals/Ideas
 - Web portal
