@@ -1,5 +1,5 @@
 # Dash
-Lightweight distributed wasm orchestrator written in go
+Lightweight distributed wasm orchestrator (to be) written in go
 
 ## Goals
 
