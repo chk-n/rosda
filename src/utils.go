@@ -1,4 +1,4 @@
-package internal
+package dash
 
 func prependBytes(s []byte, v byte) []byte {
 	s = append(s, v)
