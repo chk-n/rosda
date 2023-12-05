@@ -32,6 +32,18 @@ and other miscelaneous utilities
 - `sysnet`: local network configurations (e.g. firewalls)
 - `wasm_runtime`: runs wasm services
 
+## Third party dependencies
+- `chi`
+- `drpc`
+- `go-sqlite3`
+- `protobuf`
+- `traefik`
+- `wasmer-go`
+for dev/tests
+- `assert`
+- `oapi-codegen`
+- `sqlc`
+
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
