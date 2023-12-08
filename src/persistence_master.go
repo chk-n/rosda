@@ -20,6 +20,7 @@ type dbMaster interface {
 	GetNodeIdsByService(ctx context.Context, serviceID string) ([]string, error)
 	GetServiceLoadSince(ctx context.Context, arg qm.GetServiceLoadSinceParams) ([]qm.ServiceLoad, error)
 	UpdateImageUrl(ctx context.Context, arg qm.UpdateImageUrlParams) error
+	UpdateNodeAvailableCapacity(ctx context.Context, arg qm.UpdateNodeAvailableCapactiyParams) error
 }
 
 type PersistenceMaster struct {
@@ -240,5 +241,19 @@ func (p *PersistenceMaster) UpdateImageUrl(ctx context.Context, arg UpdateImageU
 	return p.db.UpdateImageUrl(ctx, qm.UpdateImageUrlParams{
 		ImagePath: arg.ImagePath,
 		ServiceID: arg.ServiceID,
+	})
+}
+
+type UpdateNodeAvailableCapactiyParams struct {
+	AvailableCpu int64
+	AvailableRam int64
+	NodeId       string
+}
+
+func (p *PersistenceMaster) UpdateNodeAvailableCapacity(ctx context.Context, arg UpdateNodeAvailableCapactiyParams) error {
+	return p.db.UpdateNodeAvailableCapacity(ctx, qm.UpdateNodeAvailableCapactiyParams{
+		AvailableCpu: arg.AvailableCpu,
+		AvailableRam: arg.AvailableRam,
+		NodeID:       arg.NodeId,
 	})
 }

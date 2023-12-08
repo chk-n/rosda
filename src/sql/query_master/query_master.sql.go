@@ -312,3 +312,19 @@ func (q *Queries) UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) 
 	_, err := q.db.ExecContext(ctx, updateImageUrl, arg.ImagePath, arg.ServiceID)
 	return err
 }
+
+const updateNodeAvailableCapactiy = `-- name: UpdateNodeAvailableCapactiy :exec
+UPDATE node SET available_cpu = ? AND available_ram = ?
+WHERE node_id = ?
+`
+
+type UpdateNodeAvailableCapactiyParams struct {
+	AvailableCpu int64
+	AvailableRam int64
+	NodeID       string
+}
+
+func (q *Queries) UpdateNodeAvailableCapactiy(ctx context.Context, arg UpdateNodeAvailableCapactiyParams) error {
+	_, err := q.db.ExecContext(ctx, updateNodeAvailableCapactiy, arg.AvailableCpu, arg.AvailableRam, arg.NodeID)
+	return err
+}

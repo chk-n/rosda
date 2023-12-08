@@ -112,12 +112,24 @@ CREATE TABLE registry_credential (
 );
 
 --* Triggers
-
-CREATE TRIGGER prevent_updates_client_auth_token
-BEFORE UPDATE ON client_auth_token
+CREATE TRIGGER prevent_negative_resources
+BEFORE UPDATE ON node
+FOR EACH ROW
 BEGIN
-    SELECT RAISE(FAIL, 'Updates are not allowed on this table.');
+    SELECT CASE
+        WHEN NEW.available_cpu < 0 THEN
+            RAISE (FAIL, 'available_cpu cannot be less than 0.')
+        WHEN NEW.available_ram < 0 THEN
+            RAISE (FAIL, 'available_ram cannot be less than 0.')
+    END;
 END;
+
+-- CREATE TRIGGER prevent_updates_client_auth_token
+-- BEFORE UPDATE ON client_auth_token
+-- BEGIN
+--     SELECT RAISE(FAIL, 'Updates are not allowed on this table.');
+-- END;
+
 
 --* Indexes
 

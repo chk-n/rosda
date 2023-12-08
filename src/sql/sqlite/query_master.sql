@@ -26,11 +26,13 @@ VALUES (?, ?);
 INSERT INTO client_auth_token(token, ip_address, expiry)
 VALUES (?, ?, ?);
 
-
 -- name: UpdateImageUrl :exec
 UPDATE service SET image_path = ? 
 WHERE service_id = ?;
 
+-- name: UpdateNodeAvailableCapactiy :exec
+UPDATE node SET available_cpu = ? AND available_ram = ?
+WHERE node_id = ?;
 
 -- name: GetNodeIdsByService :many
 SELECT node_id FROM service_instance
