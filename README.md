@@ -49,5 +49,6 @@ for dev/tests
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
+- VPN communication between master and worker (across datacenter / region boundaries)
 - Scheduled services
 - Gateways ("managed" proxy/lb)
