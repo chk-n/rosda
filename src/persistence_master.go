@@ -12,14 +12,12 @@ type dbMaster interface {
 	CreateNode(ctx context.Context, arg qm.CreateNodeParams) error
 	CreateService(ctx context.Context, arg qm.CreateServiceParams) error
 	CreateServiceAccessRule(ctx context.Context, arg qm.CreateServiceAccessRuleParams) error
-	CreateServiceImage(ctx context.Context, arg qm.CreateServiceImageParams) error
 	CreateServiceInstance(ctx context.Context, arg qm.CreateServiceInstanceParams) error
 	CreateServiceLoad(ctx context.Context, arg qm.CreateServiceLoadParams) error
 	GetAvailableNodes(ctx context.Context, arg qm.GetAvailableNodesParams) ([]qm.Node, error)
 	GetNodePublicKey(ctx context.Context, nodeID string) ([]string, error)
 	GetNodeIdsByService(ctx context.Context, serviceID string) ([]string, error)
 	GetServiceLoadSince(ctx context.Context, arg qm.GetServiceLoadSinceParams) ([]qm.ServiceLoad, error)
-	UpdateImageUrl(ctx context.Context, arg qm.UpdateImageUrlParams) error
 	UpdateNodeAvailableCapacity(ctx context.Context, arg qm.UpdateNodeAvailableCapactiyParams) error
 }
 
@@ -75,25 +73,23 @@ func (p *PersistenceMaster) CreateNode(ctx context.Context, arg CreateNodeParams
 
 type CreateServiceParams struct {
 	ServiceID      string
-	RegistryUrl    string
-	ImagePath      string
 	MinInstances   int64
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
 	Tags           string
+	Wasm           []byte
 }
 
 func (p *PersistenceMaster) CreateService(ctx context.Context, arg CreateServiceParams) error {
 	return p.db.CreateService(ctx, qm.CreateServiceParams{
 		ServiceID:      arg.ServiceID,
-		RegistryUrl:    arg.RegistryUrl,
-		ImagePath:      arg.ImagePath,
 		MinInstances:   arg.MinInstances,
 		MaxInstances:   arg.MaxInstances,
 		CpuPerInstance: arg.CpuPerInstance,
 		RamPerInstance: arg.RamPerInstance,
 		Tags:           arg.Tags,
+		Wasm:           arg.Wasm,
 	})
 }
 
@@ -106,18 +102,6 @@ func (p *PersistenceMaster) CreateServiceAccessRule(ctx context.Context, arg Cre
 	return p.db.CreateServiceAccessRule(ctx, qm.CreateServiceAccessRuleParams{
 		ServiceIDSource:      arg.ServiceIDSource,
 		ServiceIDDestination: arg.ServiceIDDestination,
-	})
-}
-
-type CreateServiceImageParams struct {
-	ServiceID string
-	Image     []byte
-}
-
-func (p *PersistenceMaster) CreateServiceImage(ctx context.Context, arg CreateServiceImageParams) error {
-	return p.db.CreateServiceImage(ctx, qm.CreateServiceImageParams{
-		ServiceID: arg.ServiceID,
-		Image:     arg.Image,
 	})
 }
 
@@ -235,13 +219,6 @@ func (p *PersistenceMaster) GetServiceLoadSince(ctx context.Context, arg GetServ
 type UpdateImageUrlParams struct {
 	ImagePath string
 	ServiceID string
-}
-
-func (p *PersistenceMaster) UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) error {
-	return p.db.UpdateImageUrl(ctx, qm.UpdateImageUrlParams{
-		ImagePath: arg.ImagePath,
-		ServiceID: arg.ServiceID,
-	})
 }
 
 type UpdateNodeAvailableCapactiyParams struct {

@@ -36,13 +36,12 @@ CREATE TABLE service_load (
 
 CREATE TABLE service (
     service_id TEXT NOT NULL,
-    registry_url TEXT NOT NULL,  -- e.g. gcr.io...
-    image_path TEXT NOT NULL, -- e.g. /company/backend-service
     min_instances INTEGER NOT NULL,
     max_instances INTEGER NOT NULL,
     cpu_per_instance INTEGER NOT NULL,
     ram_per_instance INTEGER NOT NULL,
     tags TEXT NOT NULL,
+    wasm BLOB NOT NULL, -- the actual service code 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -51,14 +50,6 @@ CREATE TABLE service_access_rule (
     service_id_source TEXT NOT NULL,
     service_id_destination TEXT NOT NULL,
     CONSTRAINT unique_acr UNIQUE (service_id_source, service_id_destination)
-);
-
-CREATE TABLE service_image (
-    service_id TEXT NOT NULL,
-    image BLOB NOT NULL,
-    modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT unique_service_image UNIQUE (service_id)    
 );
 
 CREATE TABLE service_scale_event (

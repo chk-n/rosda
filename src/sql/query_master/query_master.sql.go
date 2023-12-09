@@ -59,31 +59,29 @@ func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) error {
 }
 
 const createService = `-- name: CreateService :exec
-INSERT INTO service(service_id, registry_url, image_path, min_instances, max_instances, cpu_per_instance, ram_per_instance, tags)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO service(service_id, min_instances, max_instances, cpu_per_instance, ram_per_instance, tags, wasm)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateServiceParams struct {
 	ServiceID      string
-	RegistryUrl    string
-	ImagePath      string
 	MinInstances   int64
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
 	Tags           string
+	Wasm           []byte
 }
 
 func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) error {
 	_, err := q.db.ExecContext(ctx, createService,
 		arg.ServiceID,
-		arg.RegistryUrl,
-		arg.ImagePath,
 		arg.MinInstances,
 		arg.MaxInstances,
 		arg.CpuPerInstance,
 		arg.RamPerInstance,
 		arg.Tags,
+		arg.Wasm,
 	)
 	return err
 }
@@ -100,21 +98,6 @@ type CreateServiceAccessRuleParams struct {
 
 func (q *Queries) CreateServiceAccessRule(ctx context.Context, arg CreateServiceAccessRuleParams) error {
 	_, err := q.db.ExecContext(ctx, createServiceAccessRule, arg.ServiceIDSource, arg.ServiceIDDestination)
-	return err
-}
-
-const createServiceImage = `-- name: CreateServiceImage :exec
-REPLACE INTO service_image(service_id, image)
-VALUES (?, ?)
-`
-
-type CreateServiceImageParams struct {
-	ServiceID string
-	Image     []byte
-}
-
-func (q *Queries) CreateServiceImage(ctx context.Context, arg CreateServiceImageParams) error {
-	_, err := q.db.ExecContext(ctx, createServiceImage, arg.ServiceID, arg.Image)
 	return err
 }
 
@@ -296,21 +279,6 @@ func (q *Queries) GetServiceLoadSince(ctx context.Context, arg GetServiceLoadSin
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateImageUrl = `-- name: UpdateImageUrl :exec
-UPDATE service SET image_path = ? 
-WHERE service_id = ?
-`
-
-type UpdateImageUrlParams struct {
-	ImagePath string
-	ServiceID string
-}
-
-func (q *Queries) UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) error {
-	_, err := q.db.ExecContext(ctx, updateImageUrl, arg.ImagePath, arg.ServiceID)
-	return err
 }
 
 const updateNodeAvailableCapactiy = `-- name: UpdateNodeAvailableCapactiy :exec

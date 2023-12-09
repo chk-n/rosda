@@ -59,13 +59,12 @@ type ResourceScaleEvent struct {
 
 type Service struct {
 	ServiceID      string
-	RegistryUrl    string
-	ImagePath      string
 	MinInstances   int64
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
 	Tags           string
+	Wasm           []byte
 	CreatedAt      time.Time
 	ModifiedAt     time.Time
 }
@@ -79,13 +78,6 @@ type ServiceGateway struct {
 	GatewayID string
 	ServiceID string
 	CreatedAt time.Time
-}
-
-type ServiceImage struct {
-	ServiceID  string
-	Image      []byte
-	ModifiedAt time.Time
-	CreatedAt  time.Time
 }
 
 type ServiceInstance struct {
