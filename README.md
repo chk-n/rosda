@@ -5,7 +5,7 @@ Lightweight distributed wasm orchestrator (to be) written in go
 
 - Simple to use and manage
 - Lightweight (in regards to memory, cpu and LoC)
-- Highly availabile
+- Highly available
 - Autoscales services
 - Minimal third party dependencies
 - CLI for monitoring and management of cluster
@@ -49,5 +49,6 @@ for dev/tests
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
+- VPN communication between master and worker (across datacenter / region boundaries)
 - Scheduled services
 - Gateways ("managed" proxy/lb)
