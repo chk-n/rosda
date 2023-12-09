@@ -63,7 +63,6 @@ type Service struct {
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
-	Tags           string
 	Wasm           []byte
 	CreatedAt      time.Time
 	ModifiedAt     time.Time

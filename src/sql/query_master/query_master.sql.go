@@ -59,8 +59,8 @@ func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) error {
 }
 
 const createService = `-- name: CreateService :exec
-INSERT INTO service(service_id, min_instances, max_instances, cpu_per_instance, ram_per_instance, tags, wasm)
-VALUES (?, ?, ?, ?, ?, ?, ?)
+INSERT INTO service(service_id, min_instances, max_instances, cpu_per_instance, ram_per_instance, wasm)
+VALUES (?, ?, ?, ?, ?, ?)
 `
 
 type CreateServiceParams struct {
@@ -69,7 +69,6 @@ type CreateServiceParams struct {
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
-	Tags           string
 	Wasm           []byte
 }
 
@@ -80,7 +79,6 @@ func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) er
 		arg.MaxInstances,
 		arg.CpuPerInstance,
 		arg.RamPerInstance,
-		arg.Tags,
 		arg.Wasm,
 	)
 	return err
@@ -294,5 +292,44 @@ type UpdateNodeAvailableCapactiyParams struct {
 
 func (q *Queries) UpdateNodeAvailableCapactiy(ctx context.Context, arg UpdateNodeAvailableCapactiyParams) error {
 	_, err := q.db.ExecContext(ctx, updateNodeAvailableCapactiy, arg.AvailableCpu, arg.AvailableRam, arg.NodeID)
+	return err
+}
+
+const updateServiceConfig = `-- name: UpdateServiceConfig :exec
+UPDATE service SET min_instances = ? AND max_instances = ? AND cpu_per_instance = ? AND ram_per_instance = ? 
+WHERE service_id = ?
+`
+
+type UpdateServiceConfigParams struct {
+	MinInstances   int64
+	MaxInstances   int64
+	CpuPerInstance int64
+	RamPerInstance int64
+	ServiceID      string
+}
+
+func (q *Queries) UpdateServiceConfig(ctx context.Context, arg UpdateServiceConfigParams) error {
+	_, err := q.db.ExecContext(ctx, updateServiceConfig,
+		arg.MinInstances,
+		arg.MaxInstances,
+		arg.CpuPerInstance,
+		arg.RamPerInstance,
+		arg.ServiceID,
+	)
+	return err
+}
+
+const updateServiceWasm = `-- name: UpdateServiceWasm :exec
+UPDATE service SET wasm = ?
+WHERE service_id = ?
+`
+
+type UpdateServiceWasmParams struct {
+	Wasm      []byte
+	ServiceID string
+}
+
+func (q *Queries) UpdateServiceWasm(ctx context.Context, arg UpdateServiceWasmParams) error {
+	_, err := q.db.ExecContext(ctx, updateServiceWasm, arg.Wasm, arg.ServiceID)
 	return err
 }

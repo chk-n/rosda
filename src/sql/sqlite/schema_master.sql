@@ -40,7 +40,6 @@ CREATE TABLE service (
     max_instances INTEGER NOT NULL,
     cpu_per_instance INTEGER NOT NULL,
     ram_per_instance INTEGER NOT NULL,
-    tags TEXT NOT NULL,
     wasm BLOB NOT NULL, -- the actual service code 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL

@@ -18,6 +18,8 @@ type dbMaster interface {
 	GetNodePublicKey(ctx context.Context, nodeID string) ([]string, error)
 	GetNodeIdsByService(ctx context.Context, serviceID string) ([]string, error)
 	GetServiceLoadSince(ctx context.Context, arg qm.GetServiceLoadSinceParams) ([]qm.ServiceLoad, error)
+	UpdateServiceConfig(ctx context.Context, arg qm.UpdateServiceConfigParams) error
+	UpdateServiceWasm(ctx context.Context, arg qm.UpdateServiceWasmParams) error
 	UpdateNodeAvailableCapacity(ctx context.Context, arg qm.UpdateNodeAvailableCapactiyParams) error
 }
 
@@ -77,7 +79,6 @@ type CreateServiceParams struct {
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
-	Tags           string
 	Wasm           []byte
 }
 
@@ -88,7 +89,6 @@ func (p *PersistenceMaster) CreateService(ctx context.Context, arg CreateService
 		MaxInstances:   arg.MaxInstances,
 		CpuPerInstance: arg.CpuPerInstance,
 		RamPerInstance: arg.RamPerInstance,
-		Tags:           arg.Tags,
 		Wasm:           arg.Wasm,
 	})
 }
@@ -216,9 +216,34 @@ func (p *PersistenceMaster) GetServiceLoadSince(ctx context.Context, arg GetServ
 	return externalLoads, nil
 }
 
-type UpdateImageUrlParams struct {
-	ImagePath string
-	ServiceID string
+type UpdateServiceConfigParams struct {
+	ServiceId      string
+	MinInstances   int64
+	MaxInstances   int64
+	CpuPerInstance int64
+	RamPerInstance int64
+}
+
+func (p *PersistenceMaster) UpdateServiceConfig(ctx context.Context, arg UpdateServiceConfigParams) error {
+	return p.db.UpdateServiceConfig(ctx, qm.UpdateServiceConfigParams{
+		ServiceID:      arg.ServiceId,
+		MinInstances:   arg.MinInstances,
+		MaxInstances:   arg.MaxInstances,
+		CpuPerInstance: arg.CpuPerInstance,
+		RamPerInstance: arg.RamPerInstance,
+	})
+}
+
+type UpdateServiceWasmParams struct {
+	Wasm      []byte
+	ServiceId string
+}
+
+func (p *PersistenceMaster) UpdateServiceWasm(ctx context.Context, arg UpdateServiceWasmParams) error {
+	return p.db.UpdateServiceWasm(ctx, qm.UpdateServiceWasmParams{
+		ServiceID: arg.ServiceId,
+		Wasm:      arg.Wasm,
+	})
 }
 
 type UpdateNodeAvailableCapactiyParams struct {
