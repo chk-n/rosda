@@ -39,7 +39,7 @@ and other miscelaneous utilities
 - [go-sqlite3](https://github.com/mattn/go-sqlite3)
 - [protobuf](https://github.com/golang/protobuf)
 - [traefik](https://github.com/traefik/traefik)
-- container runtime
+- [crun](https://github.com/containers/crun)
 
 for dev/tests
 - [testify](https://github.com/stretchr/testify)
