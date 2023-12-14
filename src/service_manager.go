@@ -42,6 +42,7 @@ func NewServiceManager() (*ServiceManager, error) {
 		"manage/service/update":     s.manageServiceUpdateOnNode,
 		"manage/service/scale-up":   s.manageServiceScaleUpOnNode,
 		"manage/service/scale-down": s.manageServiceScaleDownOnNode,
+		"manage/service/delete":     s.manageServiceDeleteOnNode,
 	}
 	for k := range hs {
 		if err := s.register(k, hs[k]); err != nil {
@@ -61,7 +62,7 @@ func (s *ServiceManager) register(topic string, handler ServiceManagerHandler) e
 	return nil
 }
 
-// Used for creating new services
+// Used for creating/adding new services in a region
 func (s *ServiceManager) createHandler(b []byte) error {
 	//msg :=
 	if err := proto.Unmarshal(b, msg); err != nil {
@@ -69,7 +70,8 @@ func (s *ServiceManager) createHandler(b []byte) error {
 	}
 
 	// TODO: create service in db
-	// TODO: find available workers and directly reserve capacity (in one query)
+	// TODO: find available workers
+	// TODO: reserve capacity
 	// TODO: publish to manage creation
 	return nil
 }
@@ -82,6 +84,7 @@ func (s *ServiceManager) updateContainerHandler(b []byte) error {
 
 	// TODO: store update in db
 	// TODO: find relevant workers
+	// TODO:
 
 	return nil
 }
@@ -93,10 +96,21 @@ func (s *ServiceManager) updateConfigHandler(b []byte) error {
 	}
 
 	// TODO: store update in db
-	// TODO: check if region update, node count
+	// TODO: check if region added/removed, service count change
 	// TODO: fetch nodes that need updating
-	// TODO: inform peers they need to update
-	// TODO: monitor that services were updated
+	return nil
+}
+
+// Handles deleting service(s) in a region
+func (s *ServiceManager) deleteHandler(b []byte) error {
+	//msg :=
+	if err := proto.Unmarshal(b, msg); err != nil {
+		return err
+	}
+
+	// TODO: find nodes where services to be deleted
+	// TODO: publish to manage deletetion
+
 	return nil
 }
 
@@ -124,8 +138,12 @@ func (s *ServiceManager) loadHandler(b []byte) error {
 }
 
 func (s *ServiceManager) manageServiceCreationOnNode(b []byte) error {
-	// TODO: inform selected workers
-	// TODO: if worker(s) down unreserve capacity and try again
+	//msg :=
+	if err := proto.Unmarshal(b, msg); err != nil {
+		return err
+	}
+	// TODO: inform worker
+	// TODO: if worker down unreserve capacity and try again
 	// TODO: if timeout reached send cancel request to worker(s) and reassign
 	// TODO: stores service instance in db
 	return nil
@@ -145,8 +163,23 @@ func (s *ServiceManager) manageServiceUpdateOnNode(b []byte) error {
 	return nil
 }
 
+func (s *ServiceManager) manageConfigUpdateOnNode(b []byte) error {
+	//msg :=
+	if err := proto.Unmarshal(b, msg); err != nil {
+		return err
+	}
+	// TODO: inform worker they need to update
+	// TODO: monitor that services were updated
+
+	return nil
+}
+
 // Ensures worker stops service and capacity reclaimed
 func (s *ServiceManager) manageServiceScaleDownOnNode(b []byte) error {
+	//msg :=
+	if err := proto.Unmarshal(b, msg); err != nil {
+		return err
+	}
 	// TODO: inform load balancer to remove worker node for service
 	// TODO: inform selected worker
 	// TODO: reclaim capacity for node in db
@@ -155,6 +188,10 @@ func (s *ServiceManager) manageServiceScaleDownOnNode(b []byte) error {
 }
 
 func (s *ServiceManager) manageServiceScaleUpOnNode(b []byte) error {
+	//msg :=
+	if err := proto.Unmarshal(b, msg); err != nil {
+		return err
+	}
 	// TODO: register undo action; dereserve capacity
 	// TODO: inform selected worker
 	// TODO: let them download image
@@ -162,6 +199,16 @@ func (s *ServiceManager) manageServiceScaleUpOnNode(b []byte) error {
 	// TODO: register load balancer undo action
 	// TODO: ping undoer so action does happen
 
+	return nil
+}
+
+func (s *ServiceManager) manageServiceDeleteOnNode(b []byte) error {
+	//msg :=
+	if err := proto.Unmarshal(b, msg); err != nil {
+		return err
+	}
+
+	// TODO:
 	return nil
 }
 
