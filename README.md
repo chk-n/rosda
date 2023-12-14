@@ -1,5 +1,5 @@
 # Dash
-Lightweight distributed wasm orchestrator (to be) written in go
+Lightweight distributed container orchestrator (to be) written in go
 
 ## Goals
 
@@ -31,7 +31,7 @@ and other miscelaneous utilities
 - `sentry`: monitors service state (logs, metrics)
 - `proxy`: traefik proxy for request to service mapping
 - `sysnet`: local network configurations (e.g. firewalls)
-- `wasm_runtime`: runs wasm services
+- `container_runtime`: runs containers
 
 ## Third party dependencies
 - [chi](https://github.com/go-chi/chi)
@@ -39,7 +39,7 @@ and other miscelaneous utilities
 - [go-sqlite3](https://github.com/mattn/go-sqlite3)
 - [protobuf](https://github.com/golang/protobuf)
 - [traefik](https://github.com/traefik/traefik)
-- [wasmer-go](https://github.com/wasmerio/wasmer-go)
+- container runtime
 
 for dev/tests
 - [testify](https://github.com/stretchr/testify)
