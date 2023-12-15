@@ -41,8 +41,7 @@ func NewServiceManager() (*ServiceManager, error) {
 		"manage/service/create":     s.manageServiceCreationOnNode,
 		"manage/service/update":     s.manageServiceUpdateOnNode,
 		"manage/service/scale-up":   s.manageServiceScaleUpOnNode,
-		"manage/service/scale-down": s.manageServiceScaleDownOnNode,
-		"manage/service/delete":     s.manageServiceDeleteOnNode,
+		"manage/service/scale-down": s.manageServiceScaleDownOnNode, // serves as service delete
 	}
 	for k := range hs {
 		if err := s.register(k, hs[k]); err != nil {
@@ -84,7 +83,7 @@ func (s *ServiceManager) updateContainerHandler(b []byte) error {
 
 	// TODO: store update in db
 	// TODO: find relevant workers
-	// TODO:
+	// TODO: publish to manage update
 
 	return nil
 }
@@ -95,9 +94,12 @@ func (s *ServiceManager) updateConfigHandler(b []byte) error {
 		return err
 	}
 
+	// TODO: get previous config
 	// TODO: store update in db
-	// TODO: check if region added/removed, service count change
-	// TODO: fetch nodes that need updating
+	// TODO: check if region added/removed or service count change
+	// TODO: if remove or service count down => deleteHandler
+	// TODO: if region added or service count up => createHandler
+
 	return nil
 }
 
@@ -109,7 +111,7 @@ func (s *ServiceManager) deleteHandler(b []byte) error {
 	}
 
 	// TODO: find nodes where services to be deleted
-	// TODO: publish to manage deletetion
+	// TODO: publish to manage scale down
 
 	return nil
 }
@@ -200,19 +202,4 @@ func (s *ServiceManager) manageServiceScaleUpOnNode(b []byte) error {
 	// TODO: ping undoer so action does happen
 
 	return nil
-}
-
-func (s *ServiceManager) manageServiceDeleteOnNode(b []byte) error {
-	//msg :=
-	if err := proto.Unmarshal(b, msg); err != nil {
-		return err
-	}
-
-	// TODO:
-	return nil
-}
-
-// Calculates by how much a service should be scaled
-func (s *ServiceManager) calculateScaleFactor(serviceId string) (int32, error) {
-	panic("implement me")
 }
