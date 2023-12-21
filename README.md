@@ -6,6 +6,7 @@ Lightweight distributed container orchestrator (to be) written in go
 - Simple to use and manage
 - Lightweight (in regards to memory, cpu and LoC)
 - Highly available
+- Self healing
 - Autoscales services
 - Minimal third party dependencies
 - CLI for monitoring and management of cluster
