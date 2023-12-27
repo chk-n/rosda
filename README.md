@@ -38,6 +38,7 @@ and other miscelaneous utilities
 - [chi](https://github.com/go-chi/chi) (TODO remove and replace with built-in router)
 - [crun](https://github.com/containers/crun)
 - [drpc](https://github.com/storj/drpc)
+- oauth lib
 - [pgx](https://github.com/jackc/pgx)
 - [postgresql](https://www.postgresql.org)
 - [protobuf](https://github.com/golang/protobuf)
