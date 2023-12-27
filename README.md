@@ -15,7 +15,7 @@ Lightweight distributed container orchestrator (to be) written in go
 - `admin_api`: http endpoint for CLIs and web pages to interact with
 - `master_api`: dRPC endpoint for slaves to interact with (e.g. ping)
 - `service_manager`: handles CRUD operations for services
-- `service_state`: aggregates service metrics and logs
+- `sentry_receiver`: aggregates service metrics and logs
 - `service_scaler`: scales services based on load
 - `node_bouncer`: decides whether node can join cluster
 - `message_queue`: in memory message queue
@@ -29,7 +29,7 @@ and other miscelaneous utilities
 ## Components: worker
 - `worker_api`: dRPC endpoint for masters to interact with (e.g. CRUD operations for services)
 - `persistence`: sqlite
-- `sentry`: monitors service state (logs, metrics)
+- `sentry_collector`: monitors service state (logs, metrics)
 - `proxy`: traefik proxy service routing
 - `sysnet`: local network configurations (e.g. firewalls)
 - `container_runtime`: runs containers
