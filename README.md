@@ -42,6 +42,7 @@ and other miscelaneous utilities
 - [pgx](https://github.com/jackc/pgx)
 - [postgresql](https://www.postgresql.org)
 - [protobuf](https://github.com/golang/protobuf)
+- proxy/lb
 - [uuid](https://github.com/google/uuid)
 
 for dev/tests
