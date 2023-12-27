@@ -30,7 +30,7 @@ and other miscelaneous utilities
 - `worker_api`: dRPC endpoint for masters to interact with (e.g. CRUD operations for services)
 - `persistence`: sqlite
 - `sentry`: monitors service state (logs, metrics)
-- `proxy`: traefik proxy for request to service mapping
+- `proxy`: traefik proxy service routing
 - `sysnet`: local network configurations (e.g. firewalls)
 - `container_runtime`: runs containers
 
