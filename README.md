@@ -1,5 +1,5 @@
 # Dash
-Lightweight distributed container orchestrator (to be) written in go
+Lightweight distributed application orchestrator for unikernels (to be) written in go
 
 ## Goals
 
@@ -22,17 +22,18 @@ As a developer, I sought a tool that combined the ease of GCP, AWS and DO with t
 
 ## Third party dependencies 
 For accountablility it is listed here
+
+- certificate authority
 - [chi](https://github.com/go-chi/chi) (TODO remove and replace with built-in router)
-- [crun](https://github.com/containers/crun)
 - [drpc](https://github.com/storj/drpc)
+- [etcd](https://go.etcd.io/etcd/client/v3)
 - [gomemq](https://github.com/chk-n/gomemq)*
 - oauth lib
 - [retry](https://github.com/chk-n/retry)* 
-- [pgx](https://github.com/jackc/pgx)
-- [postgresql](https://www.postgresql.org)
 - [protobuf](https://github.com/golang/protobuf)
 - proxy/lb
 - [uuid](https://github.com/google/uuid)
+- [wireguard-go](https://github.com/WireGuard/wireguard-go)
 
 for dev/tests
 - [testify](https://github.com/stretchr/testify)
