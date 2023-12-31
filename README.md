@@ -13,12 +13,12 @@ Lightweight distributed container orchestrator (to be) written in go
 
 ## Components: master
 - `admin_api`: http endpoint for CLIs and web pages to interact with
-- `master_api`: dRPC endpoint for slaves to interact with (e.g. ping)
+- `master_api`: dRPC endpoint for workers to interact with (e.g. ping)
 - `service_manager`: handles CRUD operations for services
 - `sentry_receiver`: aggregates service metrics and logs
 - `service_scaler`: scales services based on load
 - `node_bouncer`: decides whether node can join cluster
-- `persistence`: sqlite
+- `persistence`: sql data layer
 - `sysnet`: local network configurations (e.g. firewalls)
 - simple leader election protocol for masters
 - `config_parser`: reads and validates service configuration files
