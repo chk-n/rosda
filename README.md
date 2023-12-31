@@ -13,7 +13,7 @@ Lightweight distributed container orchestrator (to be) written in go
 
 ## Why this project?
 
-As a developer, I sought a tool that combined the ease of GCP, AWS and DO with the affordability of other cloud alternatives (Hetzer, Infomaniak). Hence, I created this project; a straightforward, scalable solution that 'just works'. 
+As a developer, I sought a tool that combined the ease of GCP, AWS and DO with the affordability of other cloud alternatives (Hetzner, Infomaniak). Hence, I created this project; a straightforward, scalable solution that 'just works'. 
 
 ## Who is this not for?
 
