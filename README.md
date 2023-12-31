@@ -11,6 +11,15 @@ Lightweight distributed container orchestrator (to be) written in go
 - Minimal third party dependencies
 - CLI for monitoring and management of cluster
 
+## Why this project?
+
+As a developer, I sought a tool that combined the ease of GCP, AWS and DO with the affordability of other cloud alternatives (Hetzer, Infomaniak). Hence, I created this project; a straightforward, scalable solution that 'just works'. 
+
+## Who is this not for?
+
+* Large organizations that already operate Kubernetes clusters (or similar), managed by dedicated teams
+* Companies operating at "web-scale", with advanced and complex infrastructure requirements
+
 ## Components: master
 - `admin_api`: http endpoint for CLIs and web pages to interact with
 - `master_api`: dRPC endpoint for workers to interact with (e.g. ping)
@@ -59,3 +68,4 @@ for dev/tests
 - Scheduled services
 - Federated cluster
 - Gateways ("managed" proxy/lb)
+- Stateful services
