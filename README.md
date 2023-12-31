@@ -18,10 +18,9 @@ Lightweight distributed container orchestrator (to be) written in go
 - `sentry_receiver`: aggregates service metrics and logs
 - `service_scaler`: scales services based on load
 - `node_bouncer`: decides whether node can join cluster
-- `message_queue`: in memory message queue
 - `persistence`: sqlite
 - `sysnet`: local network configurations (e.g. firewalls)
-- `godaft`: simple leader election protocol for masters
+- simple leader election protocol for masters
 - `config_parser`: reads and validates service configuration files
 
 and other miscelaneous utilities
@@ -56,6 +55,7 @@ for dev/tests
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
-- VPN communication between master and worker (across datacenter / region boundaries)
+- VPN for master-to-master communication  (across datacenter / region boundaries)
 - Scheduled services
+- Federated cluster
 - Gateways ("managed" proxy/lb)
