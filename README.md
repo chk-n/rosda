@@ -29,9 +29,9 @@ For accountablility it is listed here
 - [etcd](https://go.etcd.io/etcd/client/v3)
 - [gomemq](https://github.com/chk-n/gomemq)*
 - oauth lib
-- [retry](https://github.com/chk-n/retry)* 
 - [protobuf](https://github.com/golang/protobuf)
 - proxy/lb
+- [retry](https://github.com/chk-n/retry)* 
 - [uuid](https://github.com/google/uuid)
 - [wireguard-go](https://github.com/WireGuard/wireguard-go)
 
