@@ -38,7 +38,9 @@ and other miscelaneous utilities
 - [chi](https://github.com/go-chi/chi) (TODO remove and replace with built-in router)
 - [crun](https://github.com/containers/crun)
 - [drpc](https://github.com/storj/drpc)
+- [gomemq](https://github.com/chk-n/gomemq)*
 - oauth lib
+- [retry](https://github.com/chk-n/retry)* 
 - [pgx](https://github.com/jackc/pgx)
 - [postgresql](https://www.postgresql.org)
 - [protobuf](https://github.com/golang/protobuf)
@@ -50,6 +52,7 @@ for dev/tests
 - [oapi-codegen](https://github.com/deepmap/oapi-codegen)
 - [sqlc](https://github.com/sqlc-dev/sqlc)
 
+* Written by author
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
