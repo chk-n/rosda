@@ -20,29 +20,8 @@ As a developer, I sought a tool that combined the ease of GCP, AWS and DO with t
 * Large organizations that already operate Kubernetes clusters (or similar), managed by dedicated teams
 * Companies operating at "web-scale", with advanced and complex infrastructure requirements
 
-## Components: master
-- `admin_api`: http endpoint for CLIs and web pages to interact with
-- `master_api`: dRPC endpoint for workers to interact with (e.g. ping)
-- `service_manager`: handles CRUD operations for services
-- `sentry_receiver`: aggregates service metrics and logs
-- `service_scaler`: scales services based on load
-- `node_bouncer`: decides whether node can join cluster
-- `persistence`: sql data layer
-- `sysnet`: local network configurations (e.g. firewalls)
-- simple leader election protocol for masters
-- `config_parser`: reads and validates service configuration files
-
-and other miscelaneous utilities
-
-## Components: worker
-- `worker_api`: dRPC endpoint for masters to interact with (e.g. CRUD operations for services)
-- `persistence`: sqlite
-- `sentry_collector`: monitors service state (logs, metrics)
-- `proxy`: traefik proxy service routing
-- `sysnet`: local network configurations (e.g. firewalls)
-- `container_runtime`: runs containers
-
-## Third party dependencies
+## Third party dependencies 
+For accountablility it is listed here
 - [chi](https://github.com/go-chi/chi) (TODO remove and replace with built-in router)
 - [crun](https://github.com/containers/crun)
 - [drpc](https://github.com/storj/drpc)
@@ -60,7 +39,7 @@ for dev/tests
 - [oapi-codegen](https://github.com/deepmap/oapi-codegen)
 - [sqlc](https://github.com/sqlc-dev/sqlc)
 
-* Written by author
+\* Written by author
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
