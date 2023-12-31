@@ -1,5 +1,5 @@
 # Dash
-Lightweight distributed application orchestrator for unikernels (to be) written in go
+Lightweight distributed application orchestrator for OCI containers (to be) written in go
 
 ## Goals
 
@@ -49,3 +49,4 @@ for dev/tests
 - Federated cluster
 - Gateways ("managed" proxy/lb)
 - Stateful services
+- Support Unikernels (NanoVMs)
