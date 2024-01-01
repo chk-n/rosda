@@ -1,36 +1,29 @@
 package rosda
 
-import "time"
-
-type CreateService struct {
-	HostUrl        string
-	ServiceUrl     string
-	ServiceVersion string
-	Config         serviceConfig
-	// TODO service type (web, job, worker)
-	Credentials registryCredentials
+type CreateServiceParams struct {
+	ServiceId     string
+	ImageUrl      string // NOTE idk if we will keep this field
+	ImageVersion  string
+	MinInstances  int64
+	MaxInstances  int64
+	Cpu           int64
+	Ram           int64
+	Datacenter    string
+	CloudProvider string
 }
-
-type UpdateServiceImage struct {
+type Service struct {
 	ServiceId string
-	// full url and path
-	ImageUrl     string
-	ImageVersion string
-	Credentials  registryCredentials
+	// config
+	MinInstances   int64
+	MaxInstances   int64
+	CpuPerInstance int64
+	RamPerInstance int64
+	Datacenters    []string
 }
 
-type UpdateServiceConfig struct {
-	ServiceId      string
-	ServiceUrl     string
-	ServiceVersion string
-	Config         serviceConfig
-	Credentials    registryCredentials
-}
-
-type ManageCreateService struct {
-	WorkerId          string
-	ServiceInstanceId string
-	Service           CreateService
+type ServiceInstance struct {
+	InstanceId string
+	Service
 }
 
 type Node struct {
@@ -45,23 +38,10 @@ type Node struct {
 	Port         string
 }
 
-type ServiceLoad struct {
-	ServiceId         string
-	ServiceInstanceId string
-	Cpu               int64
-	Ram               int64
-	ClientCreatedAt   time.Time
-}
-
 type serviceConfig struct {
 	Regions        []string
 	MinInstances   int64
 	MaxInstances   int64
 	CpuPerInstance int64
 	RamPerInstance int64
-}
-
-type registryCredentials struct {
-	Username string
-	Password string
 }
