@@ -2,6 +2,37 @@ package dash
 
 import "time"
 
+type CreateService struct {
+	HostUrl        string
+	ServiceUrl     string
+	ServiceVersion string
+	Config         serviceConfig
+	// TODO service type (web, job, worker)
+	Credentials registryCredentials
+}
+
+type UpdateServiceImage struct {
+	ServiceId string
+	// full url and path
+	ImageUrl     string
+	ImageVersion string
+	Credentials  registryCredentials
+}
+
+type UpdateServiceConfig struct {
+	ServiceId      string
+	ServiceUrl     string
+	ServiceVersion string
+	Config         serviceConfig
+	Credentials    registryCredentials
+}
+
+type ManageCreateService struct {
+	WorkerId          string
+	ServiceInstanceId string
+	Service           CreateService
+}
+
 type Node struct {
 	NodeId       string
 	PublicKey    string
@@ -20,4 +51,17 @@ type ServiceLoad struct {
 	Cpu               int64
 	Ram               int64
 	ClientCreatedAt   time.Time
+}
+
+type serviceConfig struct {
+	Regions        []string
+	MinInstances   int64
+	MaxInstances   int64
+	CpuPerInstance int64
+	RamPerInstance int64
+}
+
+type registryCredentials struct {
+	Username string
+	Password string
 }
