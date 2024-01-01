@@ -1,19 +1,22 @@
 package rosda
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
 	"github.com/coreos/etcd/clientv3"
-	"golang.org/x/net/context"
 )
 
 var (
 	errNotEnoughBudget = errors.New("store_master: not enough budget left")
+	errEmptyResponse   = errors.New("store_master: empty response received")
+	errFailedDelete    = errors.New("store_master: failed delete")
 )
 
 const (
 	storeService          = "/service"
+	storeInstance         = "/instance"
 	storeDatacenterBudget = "/datacenter/budget"
 )
 
@@ -32,27 +35,58 @@ func NewStoreMaster(addr string) (*StoreMaster, error) {
 	}, nil
 }
 
-type CreateServiceParams struct {
-	ServiceId     string
-	ImageUrl      string // NOTE idk if we will keep this field
-	ImageVersion  string
-	MinInstances  int64
-	MaxInstances  int64
-	Cpu           int64
-	Ram           int64
-	Datacenter    string
-	CloudProvider string
+func (s *StoreMaster) CreateService(ctx context.Context, svc Service) error {
+	return s.put(ctx, storeService+svc.ServiceId, svc)
 }
 
-func (s *StoreMaster) CreateService(ctx context.Context, arg CreateServiceParams) error {
-	val, err := structToStr(arg)
+func (s *StoreMaster) GetService(ctx context.Context, id string) (*Service, error) {
+	resp, err := s.etcd.Get(ctx, storeService+id)
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.Kvs) < 1 || resp.Kvs[0] == nil {
+		return nil, errEmptyResponse
+	}
+	v := resp.Kvs[0].Value
+	var svc Service
+	if err := strToStruct(string(v), &svc); err != nil {
+		return nil, err
+	}
+	return &svc, nil
+}
+
+func (s *StoreMaster) CreateInstance(ctx context.Context, inst ServiceInstance) error {
+	return s.put(ctx, storeInstance+inst.InstanceId, inst)
+}
+
+func (s *StoreMaster) DeleteInstance(ctx context.Context, id string) error {
+	resp, err := s.etcd.Delete(ctx, storeInstance+id)
 	if err != nil {
 		return err
 	}
-	if _, err := s.etcd.Put(ctx, storeService+arg.ServiceId, *val); err != nil {
-		return err
+	if resp.Deleted != 1 {
+		return errFailedDelete
 	}
 	return nil
+}
+
+func (s *StoreMaster) GetInstances(ctx context.Context, serviceId string) ([]*ServiceInstance, error) {
+	vals, err := s.multiGet(ctx, storeInstance, []string{serviceId})
+	if err != nil {
+		return nil, err
+	}
+
+	insts := make([]*ServiceInstance, 0, len(vals))
+
+	// TODO test how slow this decoding is
+	for _, v := range vals {
+		var inst ServiceInstance
+		if err := strToStruct(v, &inst); err != nil {
+			return nil, err
+		}
+		insts = append(insts, &inst)
+	}
+	return insts, nil
 }
 
 type UpdateBudgetParams struct {
@@ -91,6 +125,17 @@ func (s *StoreMaster) UpdateBudget(ctx context.Context, arg UpdateBudgetParams) 
 	}
 
 	return s.multiPutAtomic(ctx, storeDatacenterBudget, arg.Datacenters, newVals, vals)
+}
+
+func (s *StoreMaster) put(ctx context.Context, key string, v any) error {
+	val, err := structToStr(v)
+	if err != nil {
+		return err
+	}
+	if _, err := s.etcd.Put(ctx, key, *val); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *StoreMaster) multiGet(ctx context.Context, prefix string, keys []string) ([]string, error) {
