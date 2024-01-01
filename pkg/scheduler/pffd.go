@@ -79,7 +79,7 @@ func (b *FirstFitDescending) Schedule(containers Units, nodes Units) (ContainerP
 			}
 
 		}
-		// sort nodes as node's capacity was updated
+		// sort nodes as nodes capacity was updated
 		sort.Sort(nodes)
 	}
 	return b.ps.nTc, b.cnt
