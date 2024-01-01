@@ -9,7 +9,6 @@ import (
 
 	"github.com/chk-n/gomemq"
 	"github.com/chk-n/rosda/pkg/scheduler"
-	"github.com/chk-n/rosda/src/internal"
 	"github.com/google/uuid"
 )
 
@@ -28,6 +27,8 @@ type serviceManagerMQTopic[T any] interface {
 type serviceManagerStore interface {
 	CreateService(ctx context.Context, arg CreateServiceParams) error
 	UpdateBudget(ctx context.Context, arg UpdateBudgetParams) error
+	GetService(ctx context.Context, id string) (*Service, error)
+	GetInstances(ctx context.Context, serviceId string) ([]*ServiceInstance, error)
 }
 
 type serviceManagerScheduler interface {
@@ -48,10 +49,10 @@ type ServiceManager struct {
 }
 
 const (
-	serviceCreateTopic       = "service/create"
-	serviceDeleteTopic       = "service/delete"
-	manageServiceCreateTopic = "manage/service/create"
-	manageServiceDeleteTopic = "manage/service/delete"
+	serviceCreateTopic            = "service/create"
+	serviceDeleteTopic            = "service/delete"
+	manageServiceCreateCloudTopic = "manage/service/create/cloud"
+	manageServiceDeleteCloudTopic = "manage/service/delete/cloud"
 )
 
 type ServiceManagerHandler[T any] func(b T) error
@@ -66,31 +67,39 @@ func NewServiceManager() *ServiceManager {
 	// Register subscribers
 	{
 		cfg.Name = serviceCreateTopic
-		t, _ := gomemq.NewTopic[ServiceCreate](cfg)
+		t, _ := gomemq.NewTopic[serviceCreate](cfg)
 		t.Subscribe(s.createHandler)
 	}
 	{
 		cfg.Name = serviceDeleteTopic
-		t, _ := gomemq.NewTopic[ServiceDelete](cfg)
+		t, _ := gomemq.NewTopic[serviceDelete](cfg)
 		t.Subscribe(s.deleteHandler)
 	}
 	{
-		cfg.Name = manageServiceCreateTopic
-		t, _ := gomemq.NewTopic[ManageServiceCreate](cfg)
+		cfg.Name = manageServiceCreateCloudTopic
+		t, _ := gomemq.NewTopic[manageServiceCreateCloud](cfg)
 		t.Subscribe(s.manageServiceCreateCloud)
 	}
 
 	{
-		cfg.Name = manageServiceDeleteTopic
-		t, _ := gomemq.NewTopic[ManageServiceDelete](cfg)
+		cfg.Name = manageServiceDeleteCloudTopic
+		t, _ := gomemq.NewTopic[manageServiceDeleteCloud](cfg)
 		t.Subscribe(s.manageServiceDeleteCloud)
 	}
 
 	return s
 }
 
+type serviceCreate struct {
+	HostUrl        string
+	ServiceUrl     string
+	ServiceVersion string
+	Config         serviceConfig
+	// TODO service type (web, job, worker)
+}
+
 // Used for creating/adding new services in a region
-func (s *ServiceManager) createHandler(msg CreateService) error {
+func (s *ServiceManager) createHandler(msg serviceCreate) error {
 	// TODO: start asychronous image pull
 
 	if err := s.store.CreateService(s.ctx, CreateServiceParams{
@@ -104,17 +113,68 @@ func (s *ServiceManager) createHandler(msg CreateService) error {
 		return err
 	}
 
-	// TODO prepare cloud provider environment
+	// TODO prepare cloud provider environment (if required: create lb, set up network, push container to cloud provider)
 
-	resp, err := s.notifyServiceCreateCloud(msg)
-	if err != nil {
+	if err := s.notifyServiceCreateCloud(msg); err != nil {
+		// TODO: clean up inconsistencies (maybe publish to clean up topic)
 		return fmt.Errorf("notifying service creation failed: %w", err)
 	}
 
-	// TODO inform load balancer of change
-
 	return nil
 
+}
+
+type serviceDelete struct {
+	ServiceId string
+}
+
+// Handles deleting service(s) in a region
+func (s *ServiceManager) deleteHandler(msg serviceDelete) error {
+
+	// aquire distributed lock
+	mu, err := s.dmu.Lock(s.ctx, msg.ServiceId)
+	if err != nil {
+		return err
+	}
+	defer mu.Unlock(s.ctx)
+
+	insts, err := s.store.GetInstances(s.ctx, msg.ServiceId)
+	if err != nil {
+		// TODO: clean up inconsistencies (maybe publish to clean up topic)
+		return err
+	}
+
+	return s.notifyServiceDeleteCloud(insts)
+}
+
+type manageServiceCreateCloud struct {
+	ServiceId  string
+	InstanceId string
+	Service    serviceCreate
+}
+
+func (s *ServiceManager) manageServiceCreateCloud(msg manageServiceCreateCloud) error {
+
+	// TODO spin up vm instance
+
+	// TODO configure firewall for instance (inbound, outbound)
+
+	// TODO add instance to lb (if external)
+
+	// TODO monitor everything done
+}
+
+type manageServiceDeleteCloud struct {
+	InstanceId string
+}
+
+func (s *ServiceManager) manageServiceDeleteCloud(msg manageServiceDeleteCloud) error {
+
+	// TODO update load balancer routing
+
+	// TODO inform them to delete vm instance
+
+	// TODO monitor everything done
 }
 
 // // Performs rolling update for a service image
@@ -154,31 +214,6 @@ func (s *ServiceManager) createHandler(msg CreateService) error {
 
 // 	return nil
 // }
-
-// Handles deleting service(s) in a region
-func (s *ServiceManager) deleteHandler(imageUrl string) error {
-
-	// TODO AQUIRE DISTRIBUTED LOCK
-
-	// TODO find nodes where services to be deleted
-
-	// TODO update load balancer routing
-
-	// TODO inform them to delete service
-
-	// TODO publish to monitor delete
-
-	return nil
-}
-
-func (s *ServiceManager) manageServiceCreateCloud(msg ServiceCreateCloud) error {
-	// TODO: send request to cloud provider
-	//
-}
-
-func (s *ServiceManager) manageServiceDeleteCloud() error {
-
-}
 
 // Handles instance load (cpu, ram)
 // func (s *ServiceManager) loadHandler(msg ServiceLoad) error {
@@ -240,7 +275,7 @@ func (s *ServiceManager) manageServiceDeleteCloud() error {
 // Helper functions //
 // ---------------- //
 
-func (s *ServiceManager) updateDatacenterBudget(msg CreateService) error {
+func (s *ServiceManager) updateDatacenterBudget(msg serviceCreate) error {
 	return s.store.UpdateBudget(s.ctx, UpdateBudgetParams{
 		Datacenters: msg.Config.Regions,
 		Cpu:         msg.Config.CpuPerInstance * msg.Config.MinInstances,
@@ -248,25 +283,28 @@ func (s *ServiceManager) updateDatacenterBudget(msg CreateService) error {
 	})
 }
 
-func (s *ServiceManager) notifyServiceCreateCloud(msg CreateService) error {
-
+func (s *ServiceManager) notifyServiceCreateCloud(msg serviceCreate) error {
 	// Generate new service id
 	sId, err := genUid()
 	if err != nil {
 		return err
 	}
 
-	outs := []ManageServiceCreateCloud{}
+	outs := []manageServiceCreateCloud{}
 	for i := 0; i < int(msg.Config.MinInstances); i++ {
 		// instance id
 		iId, err := genUid()
 		if err != nil {
 			return err
 		}
-		outs = append(outs, ManageServiceCreateCloud{})
+		outs = append(outs, manageServiceCreateCloud{
+			ServiceId:  sId,
+			InstanceId: iId,
+			Service:    msg,
+		})
 	}
 
-	ctx, _ := gomemq.PublishBatchDone[ManageServiceCreateCloud](manageServiceCreateCloudTopic, outs)
+	ctx, _ := gomemq.PublishBatchDone[manageServiceCreateCloud](manageServiceCreateCloudTopic, outs)
 
 	// wait for done or return timeout error
 	select {
@@ -277,7 +315,29 @@ func (s *ServiceManager) notifyServiceCreateCloud(msg CreateService) error {
 		ctx.Cancel()
 	case <-ctx.WithDoneTimeout(maxSubscriberDoneTime):
 		ctx.Cancel()
-		// TODO: clean up inconsistencies (maybe publish to clean up topic)
+		return errors.New("") // TODO
+	}
+
+	return nil
+}
+
+func (s *ServiceManager) notifyServiceDeleteCloud(insts []*ServiceInstance) error {
+	outs := []manageServiceDeleteCloud{}
+	for _, i := range insts {
+		outs = append(outs, manageServiceDeleteCloud{InstanceId: i.InstanceId})
+	}
+
+	ctx, _ := gomemq.PublishBatchDone[manageServiceDeleteCloud](manageServiceDeleteCloudTopic, outs)
+
+	// wait for done or return timeout error
+	select {
+	case <-ctx.Done():
+		return nil
+	case <-ctx.WithAckTimeout(maxSubscriberAckTime):
+		// cancel any future work, blocks until current work finishes or errors
+		ctx.Cancel()
+	case <-ctx.WithDoneTimeout(maxSubscriberDoneTime):
+		ctx.Cancel()
 		return errors.New("") // TODO
 	}
 
