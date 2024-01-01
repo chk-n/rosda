@@ -1,4 +1,4 @@
-# Dash
+# Rosda
 Lightweight distributed application orchestrator for OCI containers (to be) written in go
 
 ## Goals
