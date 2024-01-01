@@ -7,42 +7,19 @@ import (
 
 type scheduleTestCase struct {
 	name               string
-	containers         Units
-	nodes              Units
+	containers         Containers
+	nodes              Nodes
 	expectedCnt        int
-	expectedPlacements ContainerPlacement
+	expectedPlacements []ContainerPlacement
 }
 
 func TestScheduler(t *testing.T) {
 	testCases := []scheduleTestCase{
 		{
 			name: "singular_fit-less",
-			containers: Units{
+			containers: Containers{
 				{
-					UnitId: "xyz",
-					Cpu:    2,
-					Ram:    128,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-					Count: 1,
-				}},
-			nodes: Units{
-				{
-					UnitId: "node1",
-					Cpu:    3,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-				},
-			},
-			expectedCnt: 1,
-			expectedPlacements: map[string][]Unit{
-				"node1": {
-					{
+					Unit: Unit{
 						UnitId: "xyz",
 						Cpu:    2,
 						Ram:    128,
@@ -50,324 +27,395 @@ func TestScheduler(t *testing.T) {
 							"eu1":         nil,
 							string(arm64): nil,
 						},
-						Count: 1,
-					}},
+					},
+					Count: 1,
+				}},
+			nodes: Nodes{
+				{
+					Unit: Unit{UnitId: "node1",
+						Cpu: 3,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu1":         nil,
+							string(arm64): nil,
+						}},
+				},
+			},
+			expectedCnt: 1,
+			expectedPlacements: []ContainerPlacement{
+				{
+					NodeId: "node1",
+					Containers: []Unit{
+						{
+							UnitId: "xyz",
+							Cpu:    2,
+							Ram:    128,
+							Constraints: map[string]any{
+								"eu1":         nil,
+								string(arm64): nil,
+							},
+						},
+					},
+				},
 			},
 		},
 		{
 			name: "singular_fit-equal",
-			containers: Units{
+			containers: Containers{
 				{
-					UnitId: "xyz",
-					Cpu:    2,
-					Ram:    128,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "xyz",
+						Cpu: 2,
+						Ram: 128,
+						Constraints: map[string]any{
+							"eu1":         nil,
+							string(arm64): nil,
+						}},
 					Count: 1,
 				}},
-			nodes: Units{
+			nodes: Nodes{
 				{
-					UnitId: "node1",
-					Cpu:    2,
-					Ram:    128,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-				},
-			},
-			expectedCnt: 1,
-			expectedPlacements: map[string][]Unit{
-				"node1": {
-					{
-						UnitId: "xyz",
-						Cpu:    2,
-						Ram:    128,
+					Unit: Unit{UnitId: "node1",
+						Cpu: 2,
+						Ram: 128,
 						Constraints: map[string]any{
 							"eu1":         nil,
 							string(arm64): nil,
 						},
-						Count: 1,
-					}},
+					},
+				},
+			},
+			expectedCnt: 1,
+			expectedPlacements: []ContainerPlacement{
+				{
+					NodeId: "node1",
+					Containers: []Unit{
+						{UnitId: "xyz",
+							Cpu: 2,
+							Ram: 128,
+							Constraints: map[string]any{
+								"eu1":         nil,
+								string(arm64): nil,
+							},
+						}},
+				},
 			},
 		},
-
 		{
 			name: "singular_fit-more",
-			containers: Units{
+			containers: Containers{
 				{
-					UnitId: "xyz",
-					Cpu:    3,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "xyz",
+						Cpu: 3,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu1":         nil,
+							string(arm64): nil,
+						}},
 					Count: 1,
 				}},
-			nodes: Units{
+			nodes: Nodes{
 				{
-					UnitId: "node1",
-					Cpu:    2,
-					Ram:    128,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "node1",
+						Cpu: 2,
+						Ram: 128,
+						Constraints: map[string]any{
+							"eu1":         nil,
+							string(arm64): nil,
+						}},
 				},
 			},
 			expectedCnt:        0,
-			expectedPlacements: map[string][]Unit{},
+			expectedPlacements: []ContainerPlacement{},
 		},
 		{
 			name: "multiple_fit-architecture,count",
-			containers: Units{
+			containers: Containers{
 				{
-					UnitId: "c2",
-					Cpu:    2,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu2":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "c2",
+						Cpu: 2,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu2":         nil,
+							string(arm64): nil,
+						}},
 					Count: 2,
 				},
 			},
-			nodes: Units{
+			nodes: Nodes{
 				{
-					UnitId: "node1",
-					Cpu:    4,
-					Ram:    512,
-					Constraints: map[string]any{
-						"eu2":          nil,
-						string(x86_64): nil,
-					},
+					Unit: Unit{UnitId: "node1",
+						Cpu: 4,
+						Ram: 512,
+						Constraints: map[string]any{
+							"eu2":          nil,
+							string(x86_64): nil,
+						}},
 				},
 				{
-					UnitId: "node2",
-					Cpu:    2,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu2":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "node2",
+						Cpu: 2,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu2":         nil,
+							string(arm64): nil,
+						}},
 				},
 				{
-					UnitId: "node3",
-					Cpu:    2,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu2":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "node3",
+						Cpu: 2,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu2":         nil,
+							string(arm64): nil,
+						}},
 				},
 			},
 			expectedCnt: 2,
-			expectedPlacements: map[string][]Unit{
-				"node2": {
-					{
-						UnitId: "c2",
-						Cpu:    2,
-						Ram:    256,
-						Constraints: map[string]any{
-							"eu2":         nil,
-							string(arm64): nil,
-						},
-						Count: 2,
+			expectedPlacements: []ContainerPlacement{
+				{
+					NodeId: "node2",
+					Containers: []Unit{
+						{
+							UnitId: "c2",
+							Cpu:    2,
+							Ram:    256,
+							Constraints: map[string]any{
+								"eu2":         nil,
+								string(arm64): nil,
+							}},
 					},
 				},
-				"node3": {
-					{
-						UnitId: "c2",
-						Cpu:    2,
-						Ram:    256,
-						Constraints: map[string]any{
-							"eu2":         nil,
-							string(arm64): nil,
+				{
+					NodeId: "node2",
+					Containers: []Unit{
+						{
+							UnitId: "c2",
+							Cpu:    2,
+							Ram:    256,
+							Constraints: map[string]any{
+								"eu2":         nil,
+								string(arm64): nil,
+							}},
+					},
+				},
+				{
+					NodeId: "node3",
+					Containers: []Unit{
+						{
+							UnitId: "c2",
+							Cpu:    2,
+							Ram:    256,
+							Constraints: map[string]any{
+								"eu2":         nil,
+								string(arm64): nil,
+							},
 						},
-						Count: 2,
+					},
+				},
+				{
+					NodeId: "node3",
+					Containers: []Unit{
+						{
+							UnitId: "c2",
+							Cpu:    2,
+							Ram:    256,
+							Constraints: map[string]any{
+								"eu2":         nil,
+								string(arm64): nil,
+							},
+						},
 					},
 				},
 			},
 		},
 		{
 			name: "multiple_fit-region",
-			containers: Units{
+			containers: Containers{
 				{
-					UnitId: "c1",
-					Cpu:    2,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu2":         nil,
-						string(arm64): nil,
-					},
+					Unit: Unit{UnitId: "c1",
+						Cpu: 2,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu2":         nil,
+							string(arm64): nil,
+						}},
 					Count: 2,
 				},
 				{
-					UnitId: "c2",
-					Cpu:    4,
-					Ram:    512,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-					Count: 1,
-				},
-			},
-			nodes: Units{
-				{
-					UnitId: "node1",
-					Cpu:    4,
-					Ram:    512,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-				},
-				{
-					UnitId: "node2",
-					Cpu:    2,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu2":         nil,
-						string(arm64): nil,
-					},
-				},
-				{
-					UnitId: "node3",
-					Cpu:    2,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu2":         nil,
-						string(arm64): nil,
-					},
-				},
-			},
-			expectedCnt: 3,
-			expectedPlacements: map[string][]Unit{
-				"node1": {
-					{
-						UnitId: "c2",
-						Cpu:    4,
-						Ram:    512,
+					Unit: Unit{UnitId: "c2",
+						Cpu: 4,
+						Ram: 512,
 						Constraints: map[string]any{
 							"eu1":         nil,
 							string(arm64): nil,
-						},
-						Count: 1,
-					},
+						}},
+					Count: 1,
 				},
-				"node2": {
-					{
-						UnitId: "c1",
-						Cpu:    2,
-						Ram:    256,
+			},
+			nodes: Nodes{
+				{
+					Unit: Unit{UnitId: "node1",
+						Cpu: 4,
+						Ram: 512,
+						Constraints: map[string]any{
+							"eu1":         nil,
+							string(arm64): nil,
+						}},
+				},
+				{
+					Unit: Unit{UnitId: "node2",
+						Cpu: 2,
+						Ram: 256,
 						Constraints: map[string]any{
 							"eu2":         nil,
 							string(arm64): nil,
-						},
-						Count: 2,
-					},
+						}},
 				},
-				"node3": {
-					{
-						UnitId: "c1",
-						Cpu:    2,
-						Ram:    256,
+				{
+					Unit: Unit{UnitId: "node3",
+						Cpu: 2,
+						Ram: 256,
 						Constraints: map[string]any{
 							"eu2":         nil,
 							string(arm64): nil,
+						}},
+				},
+			},
+			expectedCnt: 3,
+			expectedPlacements: []ContainerPlacement{
+				{
+					NodeId: "node1",
+					Containers: []Unit{
+						{
+							UnitId: "c2",
+							Cpu:    4,
+							Ram:    512,
+							Constraints: map[string]any{
+								"eu1":         nil,
+								string(arm64): nil,
+							},
 						},
-						Count: 2,
+					},
+				},
+				{
+					NodeId: "node2",
+					Containers: []Unit{
+						{UnitId: "c1",
+							Cpu: 2,
+							Ram: 256,
+							Constraints: map[string]any{
+								"eu2":         nil,
+								string(arm64): nil,
+							},
+						},
+					},
+				},
+				{
+					NodeId: "node3",
+					Containers: []Unit{
+						{
+							UnitId: "c1",
+							Cpu:    2,
+							Ram:    256,
+							Constraints: map[string]any{
+								"eu2":         nil,
+								string(arm64): nil,
+							},
+						},
 					},
 				},
 			},
 		},
 		{
 			name: "multiplefit_fit-priority",
-			containers: Units{
+			containers: Containers{
 				{
-					UnitId:   "c1",
-					Priority: 1,
-					Cpu:      2,
-					Ram:      128,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-					Count: 2,
-				},
-				{
-					UnitId:   "c1",
-					Priority: 2,
-					Cpu:      2,
-					Ram:      256,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-					Count: 1,
-				},
-			},
-			nodes: Units{
-				{
-					UnitId: "node1",
-					Cpu:    4,
-					Ram:    512,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-				},
-				{
-					UnitId: "node2",
-					Cpu:    3,
-					Ram:    256,
-					Constraints: map[string]any{
-						"eu1":         nil,
-						string(arm64): nil,
-					},
-				},
-			},
-			expectedCnt: 3,
-			expectedPlacements: map[string][]Unit{
-				"node1": {
-					{
-						UnitId:   "c1",
+					Unit: Unit{UnitId: "c1",
 						Priority: 1,
 						Cpu:      2,
 						Ram:      128,
 						Constraints: map[string]any{
 							"eu1":         nil,
 							string(arm64): nil,
-						},
-						Count: 2,
-					},
-					{
-						UnitId:   "c1",
+						}},
+					Count: 2,
+				},
+				{
+					Unit: Unit{UnitId: "c1",
 						Priority: 2,
 						Cpu:      2,
 						Ram:      256,
 						Constraints: map[string]any{
 							"eu1":         nil,
 							string(arm64): nil,
-						},
-						Count: 1,
-					},
+						}},
+					Count: 1,
 				},
-				"node2": {
-					{
-						UnitId:   "c1",
-						Priority: 1,
-						Cpu:      2,
-						Ram:      128,
+			},
+			nodes: Nodes{
+				{
+					Unit: Unit{UnitId: "node1",
+						Cpu: 4,
+						Ram: 512,
 						Constraints: map[string]any{
 							"eu1":         nil,
 							string(arm64): nil,
+						}},
+				},
+				{
+					Unit: Unit{UnitId: "node2",
+						Cpu: 3,
+						Ram: 256,
+						Constraints: map[string]any{
+							"eu1":         nil,
+							string(arm64): nil,
+						}},
+				},
+			},
+			expectedCnt: 3,
+			expectedPlacements: []ContainerPlacement{
+				{
+					NodeId: "node1",
+					Containers: []Unit{
+						{
+							UnitId:   "c1",
+							Priority: 1,
+							Cpu:      2,
+							Ram:      128,
+							Constraints: map[string]any{
+								"eu1":         nil,
+								string(arm64): nil,
+							}},
+					},
+				},
+				{
+					NodeId: "node1",
+					Containers: []Unit{
+						{
+							UnitId:   "c1",
+							Priority: 2,
+							Cpu:      2,
+							Ram:      256,
+							Constraints: map[string]any{
+								"eu1":         nil,
+								string(arm64): nil,
+							},
 						},
-						Count: 2,
+					},
+				},
+				{
+					NodeId: "node2",
+					Containers: []Unit{
+						{
+							UnitId:   "c1",
+							Priority: 1,
+							Cpu:      2,
+							Ram:      128,
+							Constraints: map[string]any{
+								"eu1":         nil,
+								string(arm64): nil,
+							},
+						},
 					},
 				},
 			},

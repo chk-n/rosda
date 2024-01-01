@@ -1,6 +1,6 @@
 package scheduler
 
-func canSchedule(container, node Unit) bool {
+func canSchedule(container Container, node Node) bool {
 	if container.Cpu > node.Cpu {
 		return false
 	} else if container.Ram > node.Ram {
@@ -13,4 +13,12 @@ func canSchedule(container, node Unit) bool {
 		}
 	}
 	return true
+}
+
+func CountResources(us []Unit) (cpu int64, ram int64) {
+	for _, u := range us {
+		cpu += int64(u.Cpu)
+		ram += int64(u.Ram)
+	}
+	return cpu, ram
 }

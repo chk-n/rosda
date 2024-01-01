@@ -4,8 +4,8 @@ import "testing"
 
 type canScheduleTestCase struct {
 	name      string
-	container Unit
-	node      Unit
+	container Container
+	node      Node
 	expect    bool
 }
 
@@ -13,26 +13,26 @@ func TestCanSchedule(t *testing.T) {
 	testCases := []canScheduleTestCase{
 		{
 			name:      "fail_cpu",
-			container: Unit{Cpu: 10, Ram: 100, Constraints: map[string]any{}},
-			node:      Unit{Cpu: 8, Ram: 1000, Constraints: map[string]any{}},
+			container: Container{Unit: Unit{Cpu: 10, Ram: 100, Constraints: map[string]any{}}},
+			node:      Node{Unit: Unit{Cpu: 8, Ram: 1000, Constraints: map[string]any{}}},
 			expect:    false,
 		},
 		{
 			name:      "fail_ram",
-			container: Unit{Cpu: 2, Ram: 1000, Constraints: map[string]any{}},
-			node:      Unit{Cpu: 4, Ram: 500, Constraints: map[string]any{}},
+			container: Container{Unit: Unit{Cpu: 2, Ram: 1000, Constraints: map[string]any{}}},
+			node:      Node{Unit: Unit{Cpu: 4, Ram: 500, Constraints: map[string]any{}}},
 			expect:    false,
 		},
 		{
 			name:      "fail_constaint",
-			container: Unit{Cpu: 2, Ram: 100, Constraints: map[string]any{"eu1": nil}},
-			node:      Unit{Cpu: 4, Ram: 1000, Constraints: map[string]any{}},
+			container: Container{Unit: Unit{Cpu: 2, Ram: 100, Constraints: map[string]any{"eu1": nil}}},
+			node:      Node{Unit: Unit{Cpu: 4, Ram: 1000, Constraints: map[string]any{}}},
 			expect:    false,
 		},
 		{
 			name:      "success",
-			container: Unit{Cpu: 2, Ram: 100, Constraints: map[string]any{"eu1": nil}},
-			node:      Unit{Cpu: 4, Ram: 500, Constraints: map[string]any{"eu1": nil}},
+			container: Container{Unit: Unit{Cpu: 2, Ram: 100, Constraints: map[string]any{"eu1": nil}}},
+			node:      Node{Unit: Unit{Cpu: 4, Ram: 500, Constraints: map[string]any{"eu1": nil}}},
 			expect:    true,
 		},
 	}

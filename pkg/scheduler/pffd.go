@@ -11,20 +11,20 @@ import (
 // - nodes by priority and resource availability (desc) and split the containers up by region and system architecture
 
 type FirstFitDescending struct {
-	ps  Placements
+	ps  placements
 	cnt int
 }
 
 func NewFirstFitDescending() *FirstFitDescending {
 	return &FirstFitDescending{
-		ps: Placements{
+		ps: placements{
 			nTc: make(map[string][]Unit),
 		},
 	}
 }
 
-// Returns number of scheduled containers
-func (b *FirstFitDescending) Schedule(containers Units, nodes Units) (ContainerPlacement, int) {
+// Returns which containers were placed where and number of scheduled containers
+func (b *FirstFitDescending) Schedule(containers Containers, nodes Nodes) ([]ContainerPlacement, int) {
 	sort.Sort(containers)
 	sort.Sort(nodes)
 
@@ -82,13 +82,13 @@ func (b *FirstFitDescending) Schedule(containers Units, nodes Units) (ContainerP
 		// sort nodes as node's capacity was updated
 		sort.Sort(nodes)
 	}
-	return b.ps.nTc, b.cnt
+	return b.ps.Build(), b.cnt
 
 }
 
-func (b *FirstFitDescending) place(container Unit, nodeId string) {
+func (b *FirstFitDescending) place(container Container, nodeId string) {
 	b.cnt++
-	b.ps.Put(nodeId, container)
+	b.ps.put(nodeId, container.Unit)
 }
 
 func (b *FirstFitDescending) removeLatest(cnt int) {
