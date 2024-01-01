@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "dash";
+option go_package = "rosda";
 
 
 message CreateService {

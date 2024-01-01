@@ -1,4 +1,4 @@
-package dash
+package rosda
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chk-n/dash/pkg/scheduler"
-	"github.com/chk-n/dash/src/internal"
 	"github.com/chk-n/gomemq"
+	"github.com/chk-n/rosda/pkg/scheduler"
+	"github.com/chk-n/rosda/src/internal"
 	"github.com/google/uuid"
 )
 

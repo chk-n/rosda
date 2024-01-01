@@ -1,4 +1,4 @@
-package dash
+package rosda
 
 import (
 	"net/http"
