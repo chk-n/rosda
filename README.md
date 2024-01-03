@@ -46,8 +46,8 @@ for dev/tests
 ## V2 Goals/Ideas
 - Web portal
 - Internal services to service communication
-- VPN for master-to-master communication  (across datacenter / region boundaries)
 - Scheduled services
 - Federated cluster
 - Gateways ("managed" proxy/lb)
+- Relays for encrypted service-to-service communication across datacenters / regions
 - Stateful services
