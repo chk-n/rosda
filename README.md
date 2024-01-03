@@ -1,5 +1,5 @@
 # Rosda
-Lightweight distributed application orchestrator for OCI containers (to be) written in go
+Lightweight distributed application orchestrator (to be) written in go
 
 ## Goals
 
@@ -8,6 +8,8 @@ Lightweight distributed application orchestrator for OCI containers (to be) writ
 - Highly available
 - Self healing
 - Autoscales services
+- Deploy app using unikernel
+- Immutable infrastructure
 - Minimal third party dependencies
 - CLI for monitoring and management of cluster
 
@@ -49,4 +51,3 @@ for dev/tests
 - Federated cluster
 - Gateways ("managed" proxy/lb)
 - Stateful services
-- Support Unikernels (NanoVMs)
